@@ -2,41 +2,38 @@ import random, time
 from ui.carga_de_datos import *
 from ui.ascii_frame import *
 from estructuras.arbol_binario import BST
+from estructuras.avl import AVL
+from estructuras.arbol_general import ArbolGeneral, NodoGeneral
 
 
-# CONFIGURACION PRINCIPAL
-DATOS = cargar_json("datos/dataset_10.json")
+# CONFIGURACION INICIAL
+DATOS = cargar_json("datos/dataset_100.json")
 SERIES = DATOS["series"]
+EDADES = ['TV-Y7', 'TV-14', 'TV-G', 'TV-MA', 'TV-PG']
+GENEROS = ['Horror', 'War', 'Comedy', 'Sci-Fi', 'Western', 'Fantasy', 'Game Show', 'Action', 'Thriller', 
+           'Reality', 'Crime', 'Drama', 'Talk', 'Animation', 'Mystery', 'Adventure', 'Documentary']
+
 LOOP = True
 ANCHO_RECUADRO = 60
 af = AsciiFrame(ANCHO_RECUADRO)
 
-# Crear Arbol Binario De Busqueda Para Cada Opcion Del JSON
-#str
+# Crear Arbol Binario De Busqueda
 title_bst = BST()
-genre_bst = BST()
-age_rating_bst = BST()
+# Crear Arbol AVL 
+title_avl = AVL()
+# Crear Arbol General
+arbol = ArbolGeneral()
+arbol.insertar_raiz("series")
 
-#int
-year_bst = BST()
-pop_metrics_bst = BST()
-episode_average_bst = BST()
-seasons_bst = BST()
-episodes_bst = BST()
-
-
-
-# Carga opciones que su dato es una string(Cadena de caracteres)
+# Carga datos a BST
 title_bst.load_str(SERIES, "title")
-#genre_bst.load_str(SERIES, "title")
-#age_rating_bst.load_str(SERIES, "title")
+# Carga datos a AVL
+title_avl.load_str(SERIES, "title")
+# Carga datos a ArbolGeneral
+arbol_generos = arbol.cargar_generos(arbol, GENEROS)
+arbol = arbol.cargar_series(arbol, arbol_generos, SERIES)
 
-# Carga opciones que su dato es un int(Entero)
-#year_bst.load_int(SERIES, "title")
-#pop_metrics_bst.load_int(SERIES, "title")
-#episode_average_bst.load_int(SERIES, "title")
-#seasons_bst.load_int(SERIES, "title")
-#episodes_bst.load_int(SERIES, "title")
+
 
 
 # JSON RECORDATORIO
@@ -53,8 +50,6 @@ title_bst.load_str(SERIES, "title")
 "is_finished": false
 }
 """
-
-
 
 
 
@@ -86,7 +81,7 @@ def filtrar_por(user_input:str, option:str):
     """ Filtra series por una opcion de manera lineal:
         title, genre, duration, etc...
     """
-    for serie in DATOS["series"]:
+    for serie in SERIES:
         if user_input.lower() == serie[option].lower():
             return True
     return False
@@ -95,7 +90,7 @@ def filtrar_por(user_input:str, option:str):
 def seleccionar_por(user_input:str, option:str):
     """" Retorna una lista con los nombres de series que tienen una opcion en comun. """
     lst = []
-    for serie in DATOS["series"]:
+    for serie in SERIES:
         if user_input.lower() == serie[option].lower():
             lst.append(serie)
     return lst
@@ -106,7 +101,7 @@ def obtener_opcion_aleatoria(option="title"):
         option es la opcion que queremos obtener ("titulo, genero, popularidad")
         "title" por default
     """
-    return random.choice(DATOS["series"])[option]
+    return random.choice(SERIES)[option]
     
     
 def salir():
@@ -131,7 +126,7 @@ def buscar_series():
     
 #    print("buscando serie... ")
 
-    serie = title_bst.search(nombre)
+    serie = title_avl.search(nombre)
     if len(serie) > 0:
         imprimir_texto_ensanguchado(f'La serie "{serie[0]}" SI se encuentra disponible.')
     else:
@@ -169,16 +164,13 @@ def filtrar_por_genero():
     print('Ejemplo de generos: "Talk", "Horror", "Comedy", "Crime", etc...')
         
     genero = preguntar_usuario("INGRESE EL NOMBRE DEL GENERO (en ingles): ")
-    lst = seleccionar_por(genero, "genre")
-    
-#    print("filtrando por generos...")
-    
-    if len(lst) > 0:
-        af.print_box("t")
-        af.print_text(f'Se encontraron estas series del genero "{genero}"'.upper(), "c",)
-        af.print_space("-")
-        [af.print_text(f"[{i+1}]>" + serie["title"]) for i, serie in enumerate(lst)]
-        af.print_box("b")
+
+    nodo_genero = arbol.buscar(genero) # Retorna el nodo con el genero
+
+    if nodo_genero:
+        lst = arbol.listar_hijos(nodo_genero) # Retorna una lista con todas las series con ese genero
+        imprimir_texto_ensanguchado(f'Las siguientes series son del genero "{genero}"'.upper())
+        imprimir_pantalla_ensanguchada(lst)
     else:
         imprimir_texto_ensanguchado(f'No se encontro el genero "{genero}"'.upper())
     
@@ -191,7 +183,8 @@ def filtrar_por_temporadas():
     """ Imprime las series que tienen menos o igual cantidad de temporadas
         que la ingresada por el usuario
     """
-    
+    print("NO IMPLEMENTADO AUN :(")
+    salir()
     
     
 

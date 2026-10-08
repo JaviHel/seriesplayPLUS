@@ -1,6 +1,8 @@
+import random
 from ui.carga_de_datos import *
 from estructuras.arbol_binario import BST
 from estructuras.avl import AVL
+from estructuras.arbol_general import ArbolGeneral, NodoGeneral
 
 DATOS = cargar_json("datos/dataset_1000.json")
 SERIES = DATOS["series"]
@@ -101,12 +103,12 @@ title_avl.load(SORTED_TITLES, "title")
 search_title = "iZombie"
 
 # Contador de busqueda binaria para misma serie
-title_bst.search(search_title)
-print("BST: ", title_bst.get_counter()) # le toma
+#title_bst.search(search_title)
+#print("BST: ", title_bst.get_counter()) # le toma
 #
 # Contador de busqueda avl para misma serie
-title_avl.search(search_title)
-print("AVL: ", title_avl.get_counter())
+#title_avl.search(search_title)
+#print("AVL: ", title_avl.get_counter())
 
 
 # COMPLEJIDAD ARBOL AVL vs BST (PEOR CASO PARA BST)

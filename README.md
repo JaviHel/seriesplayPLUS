@@ -10,7 +10,7 @@ El sistema resuelve la fricción y parálisis por elección del usuario adaptand
 
 * **Árbol AVL & BST:** Búsqueda eficiente y balanceada de series por título ($O(\log N)$).
 * **Árbol General:** Organización jerárquica del catálogo por categorías (géneros y público objetivo).
-* **Max-Heap (Cola de Prioridad):** Selección eficiente de los tops y rankings según la duración de sesión ($O(1)$ para la raíz y $O(\log N)$ en reordenamiento).
+* **Min-Heap (Cola de Prioridad):** Selección eficiente de los tops y rankings según la duración de sesión ($O(1)$ para la raíz y $O(\log N)$ en reordenamiento).
 
 ---
 

@@ -107,7 +107,7 @@ class BST:
     
     
     def load(self, serie, option="title"):
-        """ Carga las opciones  """
+        """ Carga las opciones """
         for title in serie:
             self.insert(title.lower(), option)
     

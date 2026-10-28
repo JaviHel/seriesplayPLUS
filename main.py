@@ -61,8 +61,10 @@ ranking_prioridad.load(SERIES)
 
 
 
-
+##############################################################################################################
 # FUNCIONES DE IMPRESION EN PANTALLA
+##############################################################################################################
+
 def imprimir_texto_ensanguchado(text, indent="c", separator=" "):
     """ Imprime Texto Dentro De Una Caja ASCII """
     af.print_box("t")
@@ -121,17 +123,17 @@ def salir():
 
 
 
-
+##############################################################################################################
 # IMPRIMIR FUNCIONALIDAD DE LAS OPCIONES DE LA PANTALLA PRINCIPAL
+##############################################################################################################
 
 def buscar_series():
     """ Imprime si la serie ingresada por el usuario esta en la base de datos
         Utiliza el arbol binario para hacer la busqueda
     """
-    # HAY QUE DARLE ESTILO A ESTO
     nombre = input("INGRESE EL NOMBRE DE LA SERIE (en ingles): ")
-    
-#    print("buscando serie... ")
+        
+    af.print_space("-")
 
 #    serie = title_bst.search(nombre) # Usando BST
     serie = title_avl.search(nombre) # Usando AVL
@@ -140,7 +142,22 @@ def buscar_series():
     else:
         imprimir_texto_ensanguchado(f'La serie "{nombre}" NO se encuentra disponible.')
 
-    salir()
+
+    # Nuevo Menu
+
+    af.print_space("-")
+
+    opciones = {
+        "Buscar Otra Serie": buscar_series,
+        "Volver Al Menu Principal": mostrar_menu_principal,
+        "salir": salir,
+    }
+    
+    imprimir_pantalla_ensanguchada(list(opciones.keys()))
+    user = input(MENSAJE_AL_USUARIO_1 + f"({1}-{len(opciones)}): ")
+    seleccionar_opcion(user, list(opciones.values()))
+
+    af.print_space("-")
 
 
 
@@ -154,6 +171,8 @@ def recomendar_por_tiempo_disponible():
     """
     
     series = ranking_prioridad.top_n(10)
+   
+    af.print_space("-") 
     
     af.print_box("t")
     af.print_text("Ranking de series populares con menos duración por episodio".upper(), "c")
@@ -163,7 +182,19 @@ def recomendar_por_tiempo_disponible():
     [af.print_text(f"[{i+1}]-{serie["title"]} - {serie["popularity_metrics"]/10}★ - {serie["episode_duration_average"]}min ", "l") for i, serie in enumerate(series)]
     af.print_box("b")
 
-    salir()
+
+    af.print_space("-")
+
+    opciones = {
+        "Volver Al Menu Principal": mostrar_menu_principal,
+        "salir": salir,
+    }
+    
+    imprimir_pantalla_ensanguchada(list(opciones.keys()))
+    user = input(MENSAJE_AL_USUARIO_1 + f"({1}-{len(opciones)}): ")
+    seleccionar_opcion(user, list(opciones.values()))
+
+    af.print_space("-")
 
 
 
@@ -172,14 +203,28 @@ def recomendar_relacionado():
     """ Recomienda una serie relacionada a la serie ingresada por el usuario """
     nombre = input("INGRESE EL NOMBRE UNA SERIE QUE LE GUSTE (en ingles): ")
     print("NO IMPLEMENTADO AUN :(")
-    salir()
+    
+    af.print_space("-")
+
+    opciones = {
+        "Volver Al Menu Principal": mostrar_menu_principal,
+        "salir": salir,
+    }
+    
+    imprimir_pantalla_ensanguchada(list(opciones.keys()))
+    user = input(MENSAJE_AL_USUARIO_1 + f"({1}-{len(opciones)}): ")
+    seleccionar_opcion(user, list(opciones.values()))
+
+    af.print_space("-")
 
 
 
 
 def recomendar_aleatorio():
+    frases = [] # lista de frases para recomendar series
     nombre = obtener_opcion_aleatoria()
-#    print("recomendando serie aleatoria...")
+    
+    af.print_space("-")
     
     af.print_box("t")
     af.print_text('TE RECOMIENDO QUE MIRES:', "c")
@@ -187,29 +232,55 @@ def recomendar_aleatorio():
     af.print_text('¡ESTA MUY BUENA!', "c")
     af.print_box("b")
     
-    salir()
+    af.print_space("-")
+
+    opciones = {
+        "Buscar Otra Serie": buscar_series,
+        "Volver Al Menu Principal": mostrar_menu_principal,
+        "salir": salir,
+    }
+    
+    imprimir_pantalla_ensanguchada(list(opciones.keys()))
+    user = input(MENSAJE_AL_USUARIO_1 + f"({1}-{len(opciones)}): ")
+    seleccionar_opcion(user, list(opciones.values()))
+
+    af.print_space("-")
 
 
 
 
 def filtrar_por_genero():
     """ Imprime las series del genero ingresado por el usuario """
-#    print('Ejemplo de generos: "Talk", "Horror", "Comedy", "Crime", etc...')
     print('Lista de generos: ' + ", ".join(GENEROS))
     print()
         
     genero = input("INGRESE EL NOMBRE DEL GENERO: ")
 
     nodo_genero = arbol_general.buscar(genero) # Retorna el nodo con el genero
+    
+    af.print_space("-")
 
     if nodo_genero:
         lst = arbol_general.listar_hijos(nodo_genero) # Retorna una lista con todas las series con ese genero
-        imprimir_texto_ensanguchado(f'Las siguientes series son del genero "{genero}"'.upper())
+        imprimir_texto_ensanguchado(f'LAS SIGUIENTES SERIES SON DEL GENERO "{genero}"')
         imprimir_pantalla_ensanguchada(lst)
     else:
-        imprimir_texto_ensanguchado(f'No se encontro el genero "{genero}"'.upper())
+        imprimir_texto_ensanguchado(f'NO SE ENCONTRÓ EL GENERO "{genero}"')
     
-    salir()
+    
+    af.print_space("-")
+
+    opciones = {
+        "Buscar Otro Genero": filtrar_por_genero,
+        "Volver Al Menu Principal": mostrar_menu_principal,
+        "salir": salir,
+    }
+    
+    imprimir_pantalla_ensanguchada(list(opciones.keys()))
+    user = input(MENSAJE_AL_USUARIO_1 + f"({1}-{len(opciones)}): ")
+    seleccionar_opcion(user, list(opciones.values()))
+
+    af.print_space("-")
 
 
 
@@ -247,63 +318,71 @@ def filtrar_por_edad():
 
 
 
-# FUNCIONES DE INPUT Y SELECCION
-#def input(message="text"):
-#    """ Imprime el mensaje en pantalla para que el usuario vea
-#    """
-#    return input(message)
-#
-
-
+##############################################################################################################
+# SELECCIONAR OPCIONES
+##############################################################################################################
 
 def seleccionar_opcion(user_input:str, method_call_lst:list):
     """ Dependiendo de lo que el usuario ingrese va a llamar a la opcion correcta 
         method_call_lst es una lista con funciones(sin parentesis) que seran ejecutadas aqui
         segun corresponda.
     """
-    
+
     # Solo llama a la funcion si el usuario ingresa un nro mayor que 0 y menor/igual al tamaño de la lista
     if user_input.isdigit() and 0 < int(user_input) <= len(method_call_lst):
-        method_call_lst[int(user_input)-1]()
+        method_call_lst[int(user_input)-1]()        
     else:  
         print(">>> ESA NO ES UNA OPCION DE LA LISTA")
-    print()
-
-
-
-
-
-
-
-
-def main():   
-    # Estas variables y titulos deberian ir cada una dentro de una funcion
-    # Variables de los titulos y opciones de cada pantalla
-    TITULO_PANTALLA_PRINCIPAL = "🎞 SERIESPLAY+ 🎞"
-    MENSAJE_AL_USUARIO = "SELECCIONE UNA OPCIÓN DEL MENU" # mensaje al usuario #1
-    # Creamos un diccionario que lo guardamos en una variable con su respectivo NOMBRE_OPTIONS
-    # en el cual la "clave" es lo que se imprime en pantalla
-    # y el "valor" es la funcion a llamar(sin parentesis, solo el nombre de la funcion)
-    OPCIONES_PANTALLA_PRINCIPAL = {"Buscar Serie": buscar_series, # BST/AVL
-                                   "Recomendar Series Cortas Y Populares": recomendar_por_tiempo_disponible, # HEAP
-                                   "Recomendar Series Relacionadas a...": recomendar_relacionado, # BFS/DFS
-                                   "Recomendar Serie Aleatoria": recomendar_aleatorio,
-                                   "Filtrar Por Genero": filtrar_por_genero,
-                                   "Filtrar Por Cantidad De Temporadas": filtrar_por_temporadas,
-                                   "Filtrar Por Duracion De Capitulo": filtrar_por_duracion_episodio,
-                                   "Filtrar Por Edad": filtrar_por_edad,
-                                   "Salir":salir,
-    }
     
+    
+
+
+
+
+
+##############################################################################################################
+##############################################################################################################
+
+
+# MENUS Y OPCIONES
+
+# Estas variables y titulos deberian ir cada una dentro de una funcion
+# Variables de los titulos y opciones de cada pantalla
+TITULO_PANTALLA_PRINCIPAL = "🎞 SERIESPLAY+ 🎞"
+MENSAJE_AL_USUARIO_1 = "SELECCIONE UNA OPCIÓN DEL MENU" # mensaje al usuario #1
+# Creamos un diccionario que lo guardamos en una variable con su respectivo NOMBRE_OPTIONS
+# en el cual la "clave" es lo que se imprime en pantalla
+# y el "valor" es la funcion a llamar(sin parentesis, solo el nombre de la funcion)
+OPCIONES_PANTALLA_PRINCIPAL = {"Buscar Serie": buscar_series, # BST/AVL
+                               "Recomendar Series Cortas Y Populares": recomendar_por_tiempo_disponible, # HEAP
+                               "Recomendar Series Relacionadas a...": recomendar_relacionado, # BFS/DFS
+                               "Recomendar Serie Aleatoria": recomendar_aleatorio,
+                               "Filtrar Por Genero": filtrar_por_genero,
+                               "Filtrar Por Cantidad De Temporadas": filtrar_por_temporadas,
+                               "Filtrar Por Duracion De Capitulo": filtrar_por_duracion_episodio,
+                               "Filtrar Por Edad": filtrar_por_edad,
+                               "Salir":salir,
+}
+
+
+def mostrar_menu_principal():
+    print()
     # Imprime los titulos y las opciones en pantalla
     imprimir_texto_ensanguchado(TITULO_PANTALLA_PRINCIPAL) # Imprime el titulo de la pantalla principal 
     imprimir_pantalla_ensanguchada(list(OPCIONES_PANTALLA_PRINCIPAL.keys())) # convierte en "list/lista" las "keys/llaves" del diccionario
 
-    
-    # Loop de la funcionalidad basica
+
+
+
+
+
+
+
+def main():    
+    mostrar_menu_principal()
     while LOOP:
         # Los mensajes deberian ser dinamicos tambien
-        user = input(MENSAJE_AL_USUARIO + f"({1}-{len(OPCIONES_PANTALLA_PRINCIPAL)}): ")
+        user = input(MENSAJE_AL_USUARIO_1 + f"({1}-{len(OPCIONES_PANTALLA_PRINCIPAL)}): ")
         #Necesita el user_input y los valores de un diccionario con funciones
         seleccionar_opcion(user, list(OPCIONES_PANTALLA_PRINCIPAL.values()))
         

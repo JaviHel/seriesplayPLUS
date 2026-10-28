@@ -39,9 +39,9 @@ avl_1000.load_str(SERIES_1000, "title")
 
 
 # COMPARACION BUSQUEDA BINARIA vs SECUENCIAL (PEOR CASO PARA SECUENCIAL)
-last_title_10 = "Bob's Burgers"
-last_title_100 = "The Americans"
-last_title_1000 = "Forever"
+last_title_10 = "bob's burgers"
+last_title_100 = "the americans"
+last_title_1000 = "forever"
 
 
 # Contador de BST para misma serie en cada dataset
@@ -77,22 +77,22 @@ def imprimir_cuadro_comparativo_bst_sec():
         af.print_box("t")
         af.print_text(f'PARA DATASET_10 "{last_title_10}"', "c")
         af.print_space("-")
-        af.print_text(f"SECUENCIAL: le tomó {get_counter_secuencial(last_title_10, SERIES_10)} pasos. ")
-        af.print_text(f"BST: le tomó {bst_10.get_counter()} pasos. ")
+        af.print_text(f"SECUENCIAL: le tomó {get_counter_secuencial(last_title_10, SERIES_10)} pasos. --> (O(n))")
+        af.print_text(f"BST: le tomó {bst_10.get_counter()} pasos. --> (O(log n))")
         af.print_space("-")
         af.print_box("c")
 
         af.print_text(f'"PARA DATASET_100 "{last_title_100}"', "c")
         af.print_space("-")
-        af.print_text(f"SECUENCIAL: le tomó {get_counter_secuencial(last_title_100, SERIES_100)} pasos. ")
-        af.print_text(f"BST: le tomó {bst_100.get_counter()} pasos. ")
+        af.print_text(f"SECUENCIAL: le tomó {get_counter_secuencial(last_title_100, SERIES_100)} pasos. --> (O(n))")
+        af.print_text(f"BST: le tomó {bst_100.get_counter()} pasos. --> (O(log n))")
         af.print_space("-")
         af.print_box("c")
 
         af.print_text(f'PARA DATASET_1000 "{last_title_1000}"', "c")
         af.print_space("-")
-        af.print_text(f"SECUENCIAL: le tomó {get_counter_secuencial(last_title_1000, SERIES_1000)} pasos. ")
-        af.print_text(f"BST: le tomó {bst_1000.get_counter()} pasos. ")
+        af.print_text(f"SECUENCIAL: le tomó {get_counter_secuencial(last_title_1000, SERIES_1000)} pasos. --> (O(n))")
+        af.print_text(f"BST: le tomó {bst_1000.get_counter()} pasos. --> (O(log n))")
         af.print_space("-")
         af.print_box("b")
 
@@ -120,15 +120,20 @@ def imprimir_cuadro_comparativo_bst_sec():
 # antes de cargar el arbol.
 # de esta manera el arbol BST se transforma en una lista enlazada comun.
 
-SORTED_10 = [{"title": serie["title"],} for serie in SERIES_10] # obtengo solo los titulos
+SORTED_10 = [{"title": serie["title"].lower(),} for serie in SERIES_10] # obtengo solo los titulos
 SORTED_10 = sorted(SORTED_10, key=lambda d: d["title"])
 
-SORTED_100 = [{"title": serie["title"],}for serie in SERIES_100] 
+SORTED_100 = [{"title": serie["title"].lower(),}for serie in SERIES_100] 
 SORTED_100 = sorted(SORTED_100, key=lambda d: d["title"])
 
-SORTED_1000 = [{"title": serie["title"],} for serie in SERIES_1000]
+# Se cargan solo 900 porque en 1000 excede el limite de recursion.
+SORTED_1000 = [{"title": serie["title"].lower(),} for i, serie in enumerate(SERIES_1000) if i < 900]
 SORTED_1000 = sorted(SORTED_1000, key=lambda d: d["title"])
 
+
+#print(SORTED_10[-1])
+#print(SORTED_100[-1])
+#print(SORTED_1000[-1])
 
 # Cargar datos ordenados BST
 sorted_bst_10 = BST()
@@ -151,9 +156,9 @@ sorted_avl_1000.load_str(SORTED_1000, "title")
 
 
 # PEORES CASOS PARA LISTA ORDENADA
-last_serie_10 = "The Voice"
-last_serie_100 = "iZombie"
-last_serie_1000 = "iZombie"
+last_serie_10 = "the voice"
+last_serie_100 = "who wants to be a millionaire"
+last_serie_1000 = "zoey 101"
 
 sorted_bst_10.search(last_serie_10)
 sorted_bst_100.search(last_serie_100)
@@ -179,22 +184,22 @@ def imprimir_cuadro_comparativo_bst_avl():
     af.print_box("t")
     af.print_text(f'PARA DATASET_10 "{last_serie_10}"', "c")
     af.print_space("-")
-    af.print_text(f"BST: le tomó {sorted_bst_10.get_counter()} pasos. ")
-    af.print_text(f"AVL: le tomó {sorted_avl_10.get_counter()} pasos. ")
+    af.print_text(f"BST: le tomó {sorted_bst_10.get_counter()} pasos. --> (O(n))")
+    af.print_text(f"AVL: le tomó {sorted_avl_10.get_counter()} pasos. --> (O(log n))")
     af.print_space("-")
     af.print_box("c")
 
     af.print_text(f'PARA DATASET_100 "{last_serie_100}"', "c")
     af.print_space("-")
-    af.print_text(f"BST: le tomó {sorted_bst_100.get_counter()} pasos. ")
-    af.print_text(f"AVL: le tomó {sorted_avl_100.get_counter()} pasos. ")
+    af.print_text(f"BST: le tomó {sorted_bst_100.get_counter()} pasos. --> (O(n))")
+    af.print_text(f"AVL: le tomó {sorted_avl_100.get_counter()} pasos. --> (O(log n))")
     af.print_space("-")
     af.print_box("c")
 
     af.print_text(f'PARA DATASET_1000 "{last_serie_1000}"', "c")
     af.print_space("-")
-    af.print_text(f"BST: le tomó {sorted_bst_1000.get_counter()} pasos. ")
-    af.print_text(f"AVL: le tomó {sorted_avl_1000.get_counter()} pasos. ")
+    af.print_text(f"BST: le tomó {sorted_bst_1000.get_counter()} pasos. --> (O(n))")
+    af.print_text(f"AVL: le tomó {sorted_avl_1000.get_counter()} pasos. --> (O(log n))")
     af.print_space("-")
     af.print_box("b")
 

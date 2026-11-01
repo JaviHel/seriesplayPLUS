@@ -5,6 +5,7 @@ from estructuras.arbol_binario import BST
 from estructuras.avl import AVL
 from estructuras.arbol_general import ArbolGeneral, NodoGeneral
 from estructuras.heap import Heap
+from estructuras.grafos import GrafoLista, cargar_grafo
 
 
 
@@ -14,8 +15,7 @@ LOOP = True
 ANCHO_RECUADRO = 80
 af = AsciiFrame(ANCHO_RECUADRO)
 
-DATOS = cargar_json("datos/dataset_1000.json")
-SERIES = DATOS["series"]
+SERIES = cargar_json("datos/dataset_1000.json")["series"]
 EDADES = ['TV-Y7', 'TV-14', 'TV-G', 'TV-MA', 'TV-PG']
 GENEROS = ['Horror', 'War', 'Comedy', 'Sci-Fi', 'Western', 'Fantasy', 'Game Show', 'Action', 'Thriller', 
            'Reality', 'Crime', 'Drama', 'Talk', 'Animation', 'Mystery', 'Adventure', 'Documentary']
@@ -41,6 +41,14 @@ arbol_general = arbol_general.cargar_series(arbol_general, arbol_generos, SERIES
 # Carga datos a Heap
 ranking_prioridad = Heap(is_max=True)
 ranking_prioridad.load(SERIES)
+
+# Carga de datos al GrafoLista
+grafo_lista = GrafoLista(len(SERIES))
+cargar_grafo(grafo_lista, SERIES)
+
+
+
+
 
 
 # JSON RECORDATORIO
@@ -78,14 +86,17 @@ def imprimir_pantalla_ensanguchada(lst, indent="l"):
     """
     af.print_box("t")
     for i, option in enumerate(lst):
-        af.print_text(f"[{i+1}]>" + option, indent)
+        af.print_text(f"[{i+1}]> {option}" , indent)
     af.print_box("b")
 
 
 
 
 
+##############################################################################################################
 # FUNCIONES UTILES PARA EL RESTO DE OPCIONES
+##############################################################################################################
+
 def filtrar_por(user_input:str, option:str):
     """ Filtra series por una opcion de manera secuencial:
         title, genre, duration, etc...
@@ -119,6 +130,32 @@ def salir():
     LOOP = False
 
 
+def seleccionar_opcion(user_input:str, method_call_lst:list, callback=None):
+    """ Dependiendo de lo que el usuario ingrese va a llamar a la opcion correcta 
+        method_call_lst es una lista con funciones(sin parentesis) que seran ejecutadas aqui
+        segun corresponda.
+    """
+
+    # Solo llama a la funcion si el usuario ingresa un nro mayor que 0 y menor/igual al tamaño de la lista
+    if user_input.isdigit() and 0 < int(user_input) <= len(method_call_lst):
+        method_call_lst[int(user_input)-1]()
+        return True
+    else:
+        print(">>> ESA NO ES UNA OPCION DE LA LISTA")
+        if callback is not None: callback()
+        return False
+
+def get_serie_index(serie_title:str, series:list):
+    """ Funcion de ayuda para saber el indice de una serie dentro de la lista de SERIES 
+    """
+    for i, serie in enumerate(series):
+        if serie_title.lower() == serie["title"].lower():
+            return series.index(serie)
+    return None
+
+
+
+
 
 
 
@@ -138,26 +175,33 @@ def buscar_series():
 #    serie = title_bst.search(nombre) # Usando BST
     serie = title_avl.search(nombre) # Usando AVL
     if len(serie) > 0:
-        imprimir_texto_ensanguchado(f'La serie "{serie[0]}" SI se encuentra disponible.')
+        af.print_box("t")
+        af.print_text(f'DETALLES DE LA SERIE "{nombre.title()}" ', "c")
+        af.print_box("c")
+                
+        for key, value in SERIES[get_serie_index(serie[0], SERIES)].items():
+            af.print_text(f'{key.title().replace("_", " ")}: {value},')
+        
+        af.print_box("b")
+    
     else:
-        imprimir_texto_ensanguchado(f'La serie "{nombre}" NO se encuentra disponible.')
+        imprimir_texto_ensanguchado(f'La serie "{nombre.title()}" NO se encuentra disponible.')
 
-
-    # Nuevo Menu
 
     af.print_space("-")
 
     opciones = {
         "Buscar Otra Serie": buscar_series,
         "Volver Al Menu Principal": mostrar_menu_principal,
-        "salir": salir,
+        "Salir": salir,
     }
     
     imprimir_pantalla_ensanguchada(list(opciones.keys()))
     user = input(MENSAJE_AL_USUARIO_1 + f"({1}-{len(opciones)}): ")
-    seleccionar_opcion(user, list(opciones.values()))
-
-    af.print_space("-")
+    
+    while seleccionar_opcion(user, list(opciones.values())) != True:
+        imprimir_pantalla_ensanguchada(list(opciones.keys()))
+        user = input(MENSAJE_AL_USUARIO_1 + f"({1}-{len(opciones)}): ")
 
 
 
@@ -165,21 +209,22 @@ def buscar_series():
 def recomendar_por_tiempo_disponible():
     """Recomienda series en base a su prioridad.
        la prioridad se calcula de la siguiente forma  
-       la duracion_promedio_episodio por la cantidad_de_episodios
-       dividido la popularidad total de la serie.
-       Valora la popularidad sobre la duracion en casos extremos.
+       se divide la popularidad de la serie con la duracion_promedio_episodio
+       multiplicado por la cantidad_de_episodios.       
+       Valora la popularidad sobre la duracion en ciertos casos.
     """
     
     series = ranking_prioridad.top_n(10)
    
-    af.print_space("-") 
+    sep = "- -"
+    af.print_space("-")
     
     af.print_box("t")
     af.print_text("Ranking de series populares con menos duración por episodio".upper(), "c")
     af.print_box("c")
-    af.print_text(" Nombre - Popularidad - Menor Duracion Promedio ", "c", "-")
+    af.print_text(" Título - Rango Etario - Popularidad - Menor Duracion Promedio ", "c", "-")
     af.print_space()
-    [af.print_text(f"[{i+1}]-{serie["title"]} - {serie["popularity_metrics"]/10}★ - {serie["episode_duration_average"]}min ", "l") for i, serie in enumerate(series)]
+    [af.print_text(f"[{i+1}]-{serie["tite"]} {sep} {serie["age_rating"]} {sep} {serie["popularity_metrics"]/10}★ {sep} {serie["episode_duration_average"]}min ", "l") for i, serie in enumerate(series)]
     af.print_box("b")
 
 
@@ -187,35 +232,75 @@ def recomendar_por_tiempo_disponible():
 
     opciones = {
         "Volver Al Menu Principal": mostrar_menu_principal,
-        "salir": salir,
+        "Salir": salir,
     }
     
     imprimir_pantalla_ensanguchada(list(opciones.keys()))
     user = input(MENSAJE_AL_USUARIO_1 + f"({1}-{len(opciones)}): ")
-    seleccionar_opcion(user, list(opciones.values()))
+    
+    while seleccionar_opcion(user, list(opciones.values())) != True:
+        imprimir_pantalla_ensanguchada(list(opciones.keys()))
+        user = input(MENSAJE_AL_USUARIO_1 + f"({1}-{len(opciones)}): ")
 
-    af.print_space("-")
 
 
 
 
 def recomendar_relacionado():
-    """ Recomienda una serie relacionada a la serie ingresada por el usuario """
-    nombre = input("INGRESE EL NOMBRE UNA SERIE QUE LE GUSTE (en ingles): ")
-    print("NO IMPLEMENTADO AUN :(")
+    """ Recomienda series relacionadas a la serie ingresada por el usuario
+        GrafoLista busca y devuelve series relacionadas en genero, edad, 
+        que tienen 10min de duracion promedio de episodio de diferencia, 
+        con mas o menos 2 temporadas y mas o menos 1 punto de diferencia en popularidad.
+    """    
+   
+
+    sep = "- -"
+    nombre = input("INGRESE EL NOMBRE DE UNA SERIE QUE LE GUSTE (en ingles): ")
     
+    # primero reviso que la serie se encuentre en la lista usando el arbol avl
+    serie = title_avl.search(nombre)
+    serie_index = get_serie_index(nombre, SERIES)
+    
+    if len(serie) > 0: # Si la serie esta disponible
+        # mostrar las series relacionadas
+        vecinos = grafo_lista.vecinos(serie_index)
+        
+        af.print_box("t")
+        af.print_text(f'LISTA DE SERIES RELACIONADAS A "{nombre.title()}" :', "c")
+        af.print_box("c")
+        
+        if len(vecinos) > 0:
+            af.print_text(" Titulo - Rango Etario - Popularidad - Duracion Promedio - Temporadas ", "c", "-")
+            af.print_space()
+        
+            for i, v in enumerate(vecinos):
+                af.print_text(f'[{i+1}]- {SERIES[v]["title"]}: {SERIES[v]["age_rating"]} {sep} {SERIES[v]["popularity_metrics"]/10} {sep} {SERIES[v]["episode_duration_average"]}min {sep} {SERIES[v]["seasons"]}', "l")    
+        
+        else:    
+            af.print_text(f'La serie "{SERIES[serie_index]["title"]}" no tiene series relacionadas.',"c")
+        
+        af.print_box("b")
+    
+    else:
+        af.print_space("-")
+        imprimir_texto_ensanguchado(f'la serie "{nombre}" no se encuentra disponible', "c")
+       
+       
     af.print_space("-")
 
     opciones = {
+        "Recomendar Otra Serie Relacionada": recomendar_relacionado,
         "Volver Al Menu Principal": mostrar_menu_principal,
-        "salir": salir,
+        "Salir": salir,
     }
     
     imprimir_pantalla_ensanguchada(list(opciones.keys()))
     user = input(MENSAJE_AL_USUARIO_1 + f"({1}-{len(opciones)}): ")
-    seleccionar_opcion(user, list(opciones.values()))
-
-    af.print_space("-")
+    
+    while seleccionar_opcion(user, list(opciones.values())) != True:
+        imprimir_pantalla_ensanguchada(list(opciones.keys()))
+        user = input(MENSAJE_AL_USUARIO_1 + f"({1}-{len(opciones)}): ")
+    
 
 
 
@@ -235,16 +320,17 @@ def recomendar_aleatorio():
     af.print_space("-")
 
     opciones = {
-        "Buscar Otra Serie": buscar_series,
+        "Recomendar Otra Serie Aleatoria": recomendar_aleatorio,
         "Volver Al Menu Principal": mostrar_menu_principal,
-        "salir": salir,
+        "Salir": salir,
     }
     
     imprimir_pantalla_ensanguchada(list(opciones.keys()))
     user = input(MENSAJE_AL_USUARIO_1 + f"({1}-{len(opciones)}): ")
-    seleccionar_opcion(user, list(opciones.values()))
-
-    af.print_space("-")
+    
+    while seleccionar_opcion(user, list(opciones.values())) != True:
+        imprimir_pantalla_ensanguchada(list(opciones.keys()))
+        user = input(MENSAJE_AL_USUARIO_1 + f"({1}-{len(opciones)}): ")
 
 
 
@@ -273,14 +359,16 @@ def filtrar_por_genero():
     opciones = {
         "Buscar Otro Genero": filtrar_por_genero,
         "Volver Al Menu Principal": mostrar_menu_principal,
-        "salir": salir,
+        "Salir": salir,
     }
     
     imprimir_pantalla_ensanguchada(list(opciones.keys()))
     user = input(MENSAJE_AL_USUARIO_1 + f"({1}-{len(opciones)}): ")
-    seleccionar_opcion(user, list(opciones.values()))
 
-    af.print_space("-")
+    while seleccionar_opcion(user, list(opciones.values())) != True:
+        imprimir_pantalla_ensanguchada(list(opciones.keys()))
+        user = input(MENSAJE_AL_USUARIO_1 + f"({1}-{len(opciones)}): ")
+
 
 
 
@@ -293,7 +381,6 @@ def filtrar_por_temporadas():
     salir()
     
     
-
 
 
 def filtrar_por_duracion_episodio():
@@ -317,50 +404,20 @@ def filtrar_por_edad():
 
 
 
-
 ##############################################################################################################
-# SELECCIONAR OPCIONES
-##############################################################################################################
-
-def seleccionar_opcion(user_input:str, method_call_lst:list):
-    """ Dependiendo de lo que el usuario ingrese va a llamar a la opcion correcta 
-        method_call_lst es una lista con funciones(sin parentesis) que seran ejecutadas aqui
-        segun corresponda.
-    """
-
-    # Solo llama a la funcion si el usuario ingresa un nro mayor que 0 y menor/igual al tamaño de la lista
-    if user_input.isdigit() and 0 < int(user_input) <= len(method_call_lst):
-        method_call_lst[int(user_input)-1]()        
-    else:  
-        print(">>> ESA NO ES UNA OPCION DE LA LISTA")
-    
-    
-
-
-
-
-
-##############################################################################################################
-##############################################################################################################
-
-
 # MENUS Y OPCIONES
+##############################################################################################################
 
-# Estas variables y titulos deberian ir cada una dentro de una funcion
-# Variables de los titulos y opciones de cada pantalla
 TITULO_PANTALLA_PRINCIPAL = "🎞 SERIESPLAY+ 🎞"
 MENSAJE_AL_USUARIO_1 = "SELECCIONE UNA OPCIÓN DEL MENU" # mensaje al usuario #1
-# Creamos un diccionario que lo guardamos en una variable con su respectivo NOMBRE_OPTIONS
-# en el cual la "clave" es lo que se imprime en pantalla
-# y el "valor" es la funcion a llamar(sin parentesis, solo el nombre de la funcion)
 OPCIONES_PANTALLA_PRINCIPAL = {"Buscar Serie": buscar_series, # BST/AVL
-                               "Recomendar Series Cortas Y Populares": recomendar_por_tiempo_disponible, # HEAP
+                               "Ranking de Series Cortas Y Populares": recomendar_por_tiempo_disponible, # HEAP
                                "Recomendar Series Relacionadas a...": recomendar_relacionado, # BFS/DFS
-                               "Recomendar Serie Aleatoria": recomendar_aleatorio,
-                               "Filtrar Por Genero": filtrar_por_genero,
-                               "Filtrar Por Cantidad De Temporadas": filtrar_por_temporadas,
-                               "Filtrar Por Duracion De Capitulo": filtrar_por_duracion_episodio,
-                               "Filtrar Por Edad": filtrar_por_edad,
+                               "Recomendar Serie Aleatoria": recomendar_aleatorio, # GRAFO
+                               "Filtrar Por Genero": filtrar_por_genero, # Arbol General
+                               "Filtrar Por Edad": filtrar_por_edad, # Arbol General
+#                               "Filtrar Por Cantidad De Temporadas": filtrar_por_temporadas,
+#                               "Filtrar Por Duracion De Capitulo": filtrar_por_duracion_episodio, 
                                "Salir":salir,
 }
 
@@ -370,6 +427,8 @@ def mostrar_menu_principal():
     # Imprime los titulos y las opciones en pantalla
     imprimir_texto_ensanguchado(TITULO_PANTALLA_PRINCIPAL) # Imprime el titulo de la pantalla principal 
     imprimir_pantalla_ensanguchada(list(OPCIONES_PANTALLA_PRINCIPAL.keys())) # convierte en "list/lista" las "keys/llaves" del diccionario
+
+
 
 
 
@@ -391,7 +450,6 @@ def main():
     
 if __name__ == "__main__":
     main()
-    
     
 
 

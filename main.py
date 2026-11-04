@@ -20,13 +20,20 @@ EDADES = ['TV-Y7', 'TV-14', 'TV-G', 'TV-MA', 'TV-PG']
 GENEROS = ['Horror', 'War', 'Comedy', 'Sci-Fi', 'Western', 'Fantasy', 'Game Show', 'Action', 'Thriller', 
            'Reality', 'Crime', 'Drama', 'Talk', 'Animation', 'Mystery', 'Adventure', 'Documentary']
 
+
 # Crear Arbol Binario De Busqueda
 title_bst = BST()
+
 # Crear Arbol AVL 
 title_avl = AVL()
-# Crear Arbol General
+
+# Crear Arbol General - Generos
 arbol_general = ArbolGeneral()
 arbol_general.insertar_raiz("series")
+
+# Crear Arbol General - Edades
+ag = ArbolGeneral()
+ag.insertar_raiz("series")
 
 # Carga datos a BST
 title_bst.load_str(SERIES, "title")
@@ -34,9 +41,13 @@ title_bst.load_str(SERIES, "title")
 # Carga datos a AVL
 title_avl.load_str(SERIES, "title")
 
-# Carga datos a ArbolGeneral
-arbol_generos = arbol_general.cargar_generos(arbol_general, GENEROS)
+# Carga datos de generos a ArbolGeneral
+arbol_generos = arbol_general.cargar_arbol(arbol_general, GENEROS)
 arbol_general = arbol_general.cargar_series(arbol_general, arbol_generos, SERIES)
+
+# Carga datos de edades a ArbolGeneral
+ag_edades = ag.cargar_arbol(ag, EDADES)
+ag = ag.cargar_series(ag, ag_edades, SERIES, category="age_rating")
 
 # Carga datos a Heap
 ranking_prioridad = Heap(is_max=True)
@@ -141,7 +152,7 @@ def seleccionar_opcion(user_input:str, method_call_lst:list, callback=None):
         method_call_lst[int(user_input)-1]()
         return True
     else:
-        print(">>> ESA NO ES UNA OPCION DE LA LISTA")
+        print(MENSAJE_AL_USUARIO_2)
         if callback is not None: callback()
         return False
 
@@ -168,7 +179,7 @@ def buscar_series():
     """ Imprime si la serie ingresada por el usuario esta en la base de datos
         Utiliza el arbol binario para hacer la busqueda
     """
-    nombre = input("INGRESE EL NOMBRE DE LA SERIE (en ingles): ")
+    nombre = input(">>>INGRESE EL NOMBRE DE LA SERIE (en ingles): ")
         
     af.print_space("-")
 
@@ -190,6 +201,7 @@ def buscar_series():
 
     af.print_space("-")
 
+    imprimir_texto_ensanguchado(TITULO_PANTALLA_SECUNDARIA, "c", "-")
     opciones = {
         "Buscar Otra Serie": buscar_series,
         "Volver Al Menu Principal": mostrar_menu_principal,
@@ -224,12 +236,14 @@ def recomendar_por_tiempo_disponible():
     af.print_box("c")
     af.print_text(" Título - Rango Etario - Popularidad - Menor Duracion Promedio ", "c", "-")
     af.print_space()
-    [af.print_text(f"[{i+1}]-{serie["tite"]} {sep} {serie["age_rating"]} {sep} {serie["popularity_metrics"]/10}★ {sep} {serie["episode_duration_average"]}min ", "l") for i, serie in enumerate(series)]
+    [af.print_text(f"[{i+1}]-{serie["title"]} {sep} {serie["age_rating"]} {sep} {serie["popularity_metrics"]/10}★ {sep} {serie["episode_duration_average"]}min ", "l") for i, serie in enumerate(series)]
     af.print_box("b")
 
 
     af.print_space("-")
 
+    imprimir_texto_ensanguchado(TITULO_PANTALLA_SECUNDARIA, "c", "-")
+    
     opciones = {
         "Volver Al Menu Principal": mostrar_menu_principal,
         "Salir": salir,
@@ -255,7 +269,7 @@ def recomendar_relacionado():
    
 
     sep = "- -"
-    nombre = input("INGRESE EL NOMBRE DE UNA SERIE QUE LE GUSTE (en ingles): ")
+    nombre = input(">>>INGRESE EL NOMBRE DE UNA SERIE QUE LE GUSTE (en ingles): ")
     
     # primero reviso que la serie se encuentre en la lista usando el arbol avl
     serie = title_avl.search(nombre)
@@ -266,15 +280,15 @@ def recomendar_relacionado():
         vecinos = grafo_lista.vecinos(serie_index)
         
         af.print_box("t")
-        af.print_text(f'LISTA DE SERIES RELACIONADAS A "{nombre.title()}" :', "c")
+        af.print_text(f'LISTA DE SERIES RELACIONADAS A "{nombre.title()}"', "c")
         af.print_box("c")
         
         if len(vecinos) > 0:
-            af.print_text(" Titulo - Rango Etario - Popularidad - Duracion Promedio - Temporadas ", "c", "-")
+            af.print_text(" Genero - Categoría De Edad - Popularidad - Duracion Promedio - Temporadas ", "c", "-")
             af.print_space()
         
             for i, v in enumerate(vecinos):
-                af.print_text(f'[{i+1}]- {SERIES[v]["title"]}: {SERIES[v]["age_rating"]} {sep} {SERIES[v]["popularity_metrics"]/10} {sep} {SERIES[v]["episode_duration_average"]}min {sep} {SERIES[v]["seasons"]}', "l")    
+                af.print_text(f'[{i+1}]- {SERIES[v]["title"]}: {SERIES[v]["genre"]} {sep} {SERIES[v]["age_rating"]} {sep} {SERIES[v]["popularity_metrics"]/10} {sep} {SERIES[v]["episode_duration_average"]}min {sep} {SERIES[v]["seasons"]}', "l")    
         
         else:    
             af.print_text(f'La serie "{SERIES[serie_index]["title"]}" no tiene series relacionadas.',"c")
@@ -283,11 +297,12 @@ def recomendar_relacionado():
     
     else:
         af.print_space("-")
-        imprimir_texto_ensanguchado(f'la serie "{nombre}" no se encuentra disponible', "c")
+        imprimir_texto_ensanguchado(f'la serie "{nombre}" no se encuentra disponible.', "c")
        
        
     af.print_space("-")
 
+    imprimir_texto_ensanguchado(TITULO_PANTALLA_SECUNDARIA, "c", "-")
     opciones = {
         "Recomendar Otra Serie Relacionada": recomendar_relacionado,
         "Volver Al Menu Principal": mostrar_menu_principal,
@@ -306,19 +321,41 @@ def recomendar_relacionado():
 
 
 def recomendar_aleatorio():
-    frases = [] # lista de frases para recomendar series
+     # lista de frases para recomendar series
+    frases = ["después me lo agradecés.", 
+              "está buenísima. Confiá.",
+              "te está esperando. No la hagas esperar.",
+              "ideal para fingir que descansás mientras hacés maratón.",
+              "no te va a decepcionar.",
+              "te va a robar la noche. Y vas a dejar que lo haga.",
+              'es de esas que dicen "una más" y terminan a las 3 AM.',
+              "cancelá todo, después arreglamos.",
+              "es plan perfecto para no hacer nada con estilo.",
+              "no es una recomendación, es una orden.",
+              "viene con riesgo de maratón. Avisado estás.",
+              "está muy buena, en serio. Dale una chance.",
+              "me tuvo enganchado de principio a fin.",
+              "es de esas que se recomiendan solas.",
+              "la rompe. Mirala y después me contás.",
+              "es una masa.",
+              "vale cada minuto.",
+              "te va a gustar, apuesto.",
+              "hoy es tu mejor plan.",
+    ]
+    
     nombre = obtener_opcion_aleatoria()
     
     af.print_space("-")
     
     af.print_box("t")
     af.print_text('TE RECOMIENDO QUE MIRES:', "c")
-    af.print_text(f'"{nombre}"', "c")
-    af.print_text('¡ESTA MUY BUENA!', "c")
+    af.print_text(f'"{nombre.title()}"', "c")
+    af.print_text(random.choice(frases).upper(), "c")
     af.print_box("b")
     
     af.print_space("-")
-
+    
+    imprimir_texto_ensanguchado(TITULO_PANTALLA_SECUNDARIA, "c", "-")
     opciones = {
         "Recomendar Otra Serie Aleatoria": recomendar_aleatorio,
         "Volver Al Menu Principal": mostrar_menu_principal,
@@ -340,7 +377,7 @@ def filtrar_por_genero():
     print('Lista de generos: ' + ", ".join(GENEROS))
     print()
         
-    genero = input("INGRESE EL NOMBRE DEL GENERO: ")
+    genero = input(">>>INGRESE EL NOMBRE DEL GENERO: ")
 
     nodo_genero = arbol_general.buscar(genero) # Retorna el nodo con el genero
     
@@ -348,14 +385,15 @@ def filtrar_por_genero():
 
     if nodo_genero:
         lst = arbol_general.listar_hijos(nodo_genero) # Retorna una lista con todas las series con ese genero
-        imprimir_texto_ensanguchado(f'LAS SIGUIENTES SERIES SON DEL GENERO "{genero}"')
+        imprimir_texto_ensanguchado(f'LAS SIGUIENTES SERIES SON DEL GENERO "{genero.title()}"')
         imprimir_pantalla_ensanguchada(lst)
     else:
-        imprimir_texto_ensanguchado(f'NO SE ENCONTRÓ EL GENERO "{genero}"')
+        imprimir_texto_ensanguchado(f'NO SE ENCONTRÓ EL GENERO "{genero.title()}"')
     
     
     af.print_space("-")
 
+    imprimir_texto_ensanguchado(TITULO_PANTALLA_SECUNDARIA, "c", "-")
     opciones = {
         "Buscar Otro Genero": filtrar_por_genero,
         "Volver Al Menu Principal": mostrar_menu_principal,
@@ -397,8 +435,53 @@ def filtrar_por_edad():
     """ Imprime las peliculas que son aptas para cierto publico
         el usuario ingresa la opcion de edad de una lista en pantalla
     """
-    print("NO IMPLEMENTADO AUN :(")
-    salir()
+    categoria_etaria = {
+        "TV-G":  " Apto Para Todo Público",
+        "TV-Y7": "7+",
+        "TV-PG": "(8-12+)", # Parent Guidance Suggested
+        "TV-14": "14+",
+        "TV-MA": "17+",
+    }
+    
+    af.print_space("-")
+    
+    af.print_box("t")
+    af.print_text("SELECCIONE UNA CATEGORÍA DE EDAD:", "c")
+    af.print_box("c")
+    
+    [af.print_text(f'{key}: {value}') for key, value in categoria_etaria.items()]
+    
+    af.print_box("b")
+    
+        
+    edad = input("INGRESE UNA CATEGORÍA DE EDAD (Ej: TV-PG): ")
+    nodo_edad = ag.buscar(edad.lower())
+        
+    if nodo_edad:
+        lst = ag.listar_hijos(nodo_edad)
+        imprimir_texto_ensanguchado(f'LAS SIGUIENTES SERIES SON DE LA CATEGORÍA DE EDAD "{edad.upper()}"')
+        imprimir_pantalla_ensanguchada(lst)
+    
+    else:    
+        imprimir_texto_ensanguchado(f'NO SE ENCONTRÓ NINGUNA SERIE CON LA CATEGORÍA "{edad.title()}"')
+
+
+    af.print_space("-")
+    
+    imprimir_texto_ensanguchado(TITULO_PANTALLA_SECUNDARIA, "c", "-")
+    opciones = {
+        "Buscar Otra Categoría": filtrar_por_edad,
+        "Volver Al Menu Principal": mostrar_menu_principal,
+        "Salir": salir,
+    }
+
+    imprimir_pantalla_ensanguchada(list(opciones.keys()))
+    user = input(MENSAJE_AL_USUARIO_1 + f"({1}-{len(opciones)}): ")
+
+    while seleccionar_opcion(user, list(opciones.values())) != True:
+        imprimir_pantalla_ensanguchada(list(opciones.keys()))
+        user = input(MENSAJE_AL_USUARIO_1 + f"({1}-{len(opciones)}): ")
+        
 
 
 
@@ -409,13 +492,17 @@ def filtrar_por_edad():
 ##############################################################################################################
 
 TITULO_PANTALLA_PRINCIPAL = "🎞 SERIESPLAY+ 🎞"
+TITULO_PANTALLA_SECUNDARIA = " MENU DE OPCIONES "
+
 MENSAJE_AL_USUARIO_1 = "SELECCIONE UNA OPCIÓN DEL MENU" # mensaje al usuario #1
+MENSAJE_AL_USUARIO_2 = ">>> ESA NO ES UNA OPCION DE LA LISTA!"
+
 OPCIONES_PANTALLA_PRINCIPAL = {"Buscar Serie": buscar_series, # BST/AVL
                                "Ranking de Series Cortas Y Populares": recomendar_por_tiempo_disponible, # HEAP
                                "Recomendar Series Relacionadas a...": recomendar_relacionado, # BFS/DFS
                                "Recomendar Serie Aleatoria": recomendar_aleatorio, # GRAFO
                                "Filtrar Por Genero": filtrar_por_genero, # Arbol General
-                               "Filtrar Por Edad": filtrar_por_edad, # Arbol General
+                               "Filtrar Por Categoría De Edad": filtrar_por_edad, # Arbol General
 #                               "Filtrar Por Cantidad De Temporadas": filtrar_por_temporadas,
 #                               "Filtrar Por Duracion De Capitulo": filtrar_por_duracion_episodio, 
                                "Salir":salir,
@@ -427,7 +514,6 @@ def mostrar_menu_principal():
     # Imprime los titulos y las opciones en pantalla
     imprimir_texto_ensanguchado(TITULO_PANTALLA_PRINCIPAL) # Imprime el titulo de la pantalla principal 
     imprimir_pantalla_ensanguchada(list(OPCIONES_PANTALLA_PRINCIPAL.keys())) # convierte en "list/lista" las "keys/llaves" del diccionario
-
 
 
 

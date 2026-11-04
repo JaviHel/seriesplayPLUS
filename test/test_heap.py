@@ -1,8 +1,5 @@
 from estructuras.heap import Heap
 
-# ATENCION!
-# NO CORRE EN ESTE DIRECTORIO, HAY QUE PONERLO EN EL DIRECTORIO PRINCIPAL
-
 # TEST HEAP
 
 ranking = Heap()

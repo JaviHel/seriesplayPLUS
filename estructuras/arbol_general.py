@@ -190,7 +190,7 @@ class ArbolGeneral:
 
 
 
-    def cargar_generos(self, arbol, generos):
+    def cargar_arbol(self, arbol, generos:list):
         """ Carga el arbol con generos y retorna una lista con ellos
             necesita el arbol con la raiz y una lista de generos
         """
@@ -200,7 +200,7 @@ class ArbolGeneral:
             lst.append(arbol_genero)
         return lst
 
-    def cargar_series(self, arbol, arbol_generos, series):
+    def cargar_series(self, arbol, arbol_generos, series, category="genre"):
         """ Carga los generos en el arbol y retorna el arbol cargado
             necesita el arbol con la raiz y los generos cargados
             arbol_generos es la lista que retorna cargar_generos
@@ -208,7 +208,7 @@ class ArbolGeneral:
         """
         for genero in arbol_generos:
              for serie in series:
-                if serie["genre"] == genero.dato:
+                if serie[category] == genero.dato:
                     arbol.agregar_hijo(genero, serie["title"])     
         return arbol
 

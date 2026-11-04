@@ -2,9 +2,6 @@ from estructuras.grafos import GrafoMatriz, GrafoLista
 from ui.carga_de_datos import cargar_json
 
 
-# ATENCION!
-# NO CORRE EN ESTE DIRECTORIO, HAY QUE PONERLO EN EL DIRECTORIO PRINCIPAL
-
 series = cargar_json("datos/dataset_1000.json")["series"]
 
 

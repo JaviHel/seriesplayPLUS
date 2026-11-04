@@ -5,10 +5,6 @@ from estructuras.arbol_general import ArbolGeneral
 DATOS = cargar_json("datos/dataset_100.json")
 SERIES = DATOS["series"]
 
-
-# ATENCION!
-# NO CORRE EN ESTE DIRECTORIO, HAY QUE PONERLO EN EL DIRECTORIO PRINCIPAL
-
  
 
 # ==================== EJEMPLO DE USO ====================

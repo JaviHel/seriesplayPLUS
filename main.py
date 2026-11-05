@@ -172,7 +172,7 @@ def get_serie_index(serie_title:str, series:list):
 
 
 ##############################################################################################################
-# IMPRIMIR FUNCIONALIDAD DE LAS OPCIONES DE LA PANTALLA PRINCIPAL
+# IMPRIMIR FUNCIONALIDAD DE LAS OPCIONES EN LA PANTALLA PRINCIPAL
 ##############################################################################################################
 
 def buscar_series():

@@ -1,7 +1,7 @@
-from collections  import deque
+from collections import deque
 
 class Recorridos:
-    def bfs(inicio): # inicio es el nodo desde el cual empieza
+    def bfs(inicio, grafo): # inicio es el nodo desde el cual empieza
         visitados = {inicio}
         cola = deque([inicio])
         orden = []
@@ -9,11 +9,13 @@ class Recorridos:
         while cola:
             u = cola.popleft()
             orden.append(u)
-            for v in self.vecinos(u):
+            for v in grafo.vecinos(u):
                 if v not in visitados:
+                    # hay que agregar la condicion del tiempo
+                    # la misma de cuando se construye el grafo
                     visitados.add(v)
                     cola.append(v)
-            return orden
+        return orden
             
             
     def dfs(inicio):
@@ -58,11 +60,6 @@ class Recorridos:
                 vistos.update(comp)
                 componentes.append(comp)
         return componentes
-    
-            
-
-    def camino_minimo():
-        pass
             
             
             

@@ -1,4 +1,5 @@
 from estructuras.grafos import GrafoMatriz, GrafoLista
+from algoritmos.recorridos import Recorridos
 from ui.carga_de_datos import cargar_json
 
 
@@ -38,7 +39,6 @@ def get_serie_index(serie_title:str, series:list) -> int:
     return None
 
 
-
 def cargar_grafo(grafo:GrafoLista, series:list): # O(n**2)
     episode_duration_range = 10
     seasons_range = 2
@@ -70,27 +70,29 @@ def cargar_grafo(grafo:GrafoLista, series:list): # O(n**2)
 
 
 def mostrar_relacionado_a():
-    serie_title = input("ingrese una serie: ")
+    serie_title = my_serie # input("ingrese una serie: ")
     index = get_serie_index(serie_title, series)
     vecinos = gl.vecinos(index)
     
-    print()
-    print("title, genre, age_rating, episode_duration, seasons,".upper())    
-    print(f"USER: {series[index]["title"]}, {series[index]["genre"]}, {series[index]["age_rating"]}, {series[index]["popularity_metrics"]/10}, {series[index]["episode_duration_average"]}, {series[index]["seasons"]}")
-    print()
+#    print()
+#    print("title, genre, age_rating, episode_duration, seasons,".upper())    
+#    print(f"USER: {series[index]["title"]}, {series[index]["genre"]}, {series[index]["age_rating"]}, {series[index]["popularity_metrics"]/10}, {series[index]["episode_duration_average"]}, {series[index]["seasons"]}")
+#    print()
     
-    for vecino in vecinos:
-        print(f"{series[vecino]["title"]}, {series[vecino]["genre"]}, {series[vecino]["age_rating"]}, {series[vecino]["popularity_metrics"]/10}, {series[vecino]["episode_duration_average"]}, {series[vecino]["seasons"]}")     
+#    for vecino in vecinos:
+#        print(f"{series[vecino]["title"]}, {series[vecino]["genre"]}, {series[vecino]["age_rating"]}, {series[vecino]["popularity_metrics"]/10}, {series[vecino]["episode_duration_average"]}, {series[vecino]["seasons"]}")     
   
-    print()
-    print("TOTAL:", len(vecinos))
+#    print()
+#    print("TOTAL:", len(vecinos))
+    
+    return vecinos
 
 
 
 cargar_grafo(gl, series)
 
 
-my_serie = "house"
+my_serie = "the good doctor"
 my_serie_index = get_serie_index(my_serie, series)
 
 #vecinos_gm = (gm.vecinos(my_serie_index))
@@ -100,11 +102,37 @@ my_serie_index = get_serie_index(my_serie, series)
 #mostrar_relacionado_a(my_serie, vecinos_gl)
 
 
-mostrar_relacionado_a()
+vecinos = mostrar_relacionado_a()
 
 
 #gm.mostrar()
 #gl.mostrar()
+
+
+print(vecinos)
+print(series[vecinos[1]]["title"])
+
+# necesita la condicion de orden por tiempo y genero
+nuevos_vecinos = Recorridos.bfs(vecinos[1], gl)
+print(nuevos_vecinos) 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

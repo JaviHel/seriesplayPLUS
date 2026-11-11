@@ -1,6 +1,6 @@
 # SeriesPlay+ 🎞️
 
-**SeriesPlay+** es un motor de recomendación y exploración de series diseñado para optimizar el descubrimiento de contenido según la **duración de sesión**. 
+**SeriesPlay+** es un motor de recomendación y exploración de series diseñado para optimizar el descubrimiento de contenido según el **tiempo disponible del usuario**. 
 
 El sistema resuelve la fricción y parálisis por elección del usuario adaptando la oferta audiovisual al formato o ventana de tiempo libre real del que dispone (desde contenidos de formato corto hasta maratones estructuradas), permitiéndole filtrar, explorar y recibir recomendaciones sin comprometer largos períodos de seguimiento.
 
@@ -8,10 +8,11 @@ El sistema resuelve la fricción y parálisis por elección del usuario adaptand
 
 ## 🛠️ Estructuras de Datos Utilizadas
 
-* **Árbol AVL & BST:** Búsqueda eficiente y balanceada de series por título ($O(\log N)$).
-* **Árbol General:** Organización jerárquica del catálogo por categorías (géneros y público objetivo).
-* **Max-Heap (Cola de Prioridad):** Selección eficiente de los tops y rankings según la duración de sesión ($O(1)$ para la raíz y $O(\log N)$ en reordenamiento).
+* **Árbol AVL & BST:** Búsqueda eficiente y balanceada de series por título (O(log N)).
+* **Árbol General:** Organización jerárquica del catálogo por categorías (géneros y público objetivo) (O(log N)).
+* **Max-Heap (Cola de Prioridad):** Selección eficiente de los tops y rankings según la duración de sesión o tiempo disponible del usuario (O(1) para la raíz y O(log N) en reordenamiento).
 * **Grafos:** Se usó un grafo no dirigido y no ponderado, representado con listas de adyacencia (GrafoLista), para la opción "Recomendar Serie Relacionada".
+* **BFS:** Se utilizó el algoritmo BFS para expandir la recomendacion de series relacionadas, para la opción "Recomendar Serie Relacionada".
 
 ---
 

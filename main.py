@@ -6,6 +6,7 @@ from estructuras.avl import AVL
 from estructuras.arbol_general import ArbolGeneral, NodoGeneral
 from estructuras.heap import Heap
 from estructuras.grafos import GrafoLista, cargar_grafo
+from algoritmos.recorridos import Recorridos
 
 
 
@@ -141,7 +142,7 @@ def salir():
     LOOP = False
 
 
-def seleccionar_opcion(user_input:str, method_call_lst:list, callback=None):
+def seleccionar_opcion(user_input:str, method_call_lst:list):
     """ Dependiendo de lo que el usuario ingrese va a llamar a la opcion correcta 
         method_call_lst es una lista con funciones(sin parentesis) que seran ejecutadas aqui
         segun corresponda.
@@ -153,7 +154,6 @@ def seleccionar_opcion(user_input:str, method_call_lst:list, callback=None):
         return True
     else:
         print(MENSAJE_AL_USUARIO_2)
-        if callback is not None: callback()
         return False
 
 def get_serie_index(serie_title:str, series:list):
@@ -267,7 +267,7 @@ def recomendar_relacionado():
         con mas o menos 2 temporadas y mas o menos 1 punto de diferencia en popularidad.
     """    
    
-
+    vecinos = None
     sep = "- -"
     nombre = input(">>>INGRESE EL NOMBRE DE UNA SERIE QUE LE GUSTE (en ingles): ")
     
@@ -300,15 +300,19 @@ def recomendar_relacionado():
         imprimir_texto_ensanguchado(f'la serie "{nombre}" no se encuentra disponible.', "c")
        
        
+       
     af.print_space("-")
-
+    
     imprimir_texto_ensanguchado(TITULO_PANTALLA_SECUNDARIA, "c", "-")
+ 
     opciones = {
         "Recomendar Otra Serie Relacionada": recomendar_relacionado,
+        "Explorar nueva recomendación": lambda: recomendar_bfs(vecinos),
         "Volver Al Menu Principal": mostrar_menu_principal,
         "Salir": salir,
     }
-    
+ 
+        
     imprimir_pantalla_ensanguchada(list(opciones.keys()))
     user = input(MENSAJE_AL_USUARIO_1 + f"({1}-{len(opciones)}): ")
     
@@ -316,6 +320,60 @@ def recomendar_relacionado():
         imprimir_pantalla_ensanguchada(list(opciones.keys()))
         user = input(MENSAJE_AL_USUARIO_1 + f"({1}-{len(opciones)}): ")
     
+
+        
+           
+        
+def recomendar_bfs(vecinos):
+    """ Busca en anchura los vecinos de la serie seleccionada en recomendar_relacionado
+    """
+    serie_index = input(f">>>INGRESE EL INDICE DE UNA SERIE DE LA LISTA ANTERIOR({1}-{len(vecinos)}): ")  
+           
+    
+    if serie_index.isdigit() and 0 < int(serie_index) <= len(vecinos):
+        serie_index = int(serie_index)
+        vecinos = Recorridos.bfs(vecinos[serie_index-1], grafo_lista)
+        
+        sep = "-"
+        af.print_box("t")
+        af.print_text(f'LISTA DE SERIES RELACIONADAS A "{SERIES[vecinos[0]]["title"].title()}"', "c")
+        af.print_box("c")
+        
+        if len(vecinos) > 0:
+            af.print_text(" Genero - Categoría De Edad - Popularidad - Duracion Promedio - Temporadas ", "c", "-")
+            af.print_space()
+        
+            for i, v in enumerate(vecinos):             
+                af.print_text(f'[{i+1}]> {SERIES[v]["title"]}: {SERIES[v]["genre"]} {sep} {SERIES[v]["age_rating"]} {sep} {SERIES[v]["popularity_metrics"]/10} {sep} {SERIES[v]["episode_duration_average"]}min {sep} {SERIES[v]["seasons"]}', "l")    
+        
+        else:    
+            af.print_text(f'La serie "{SERIES[serie_index]["title"]}" no tiene series relacionadas.',"c")
+        
+        af.print_box("b")
+        
+    else:
+        print("Esa no es una opción del menú")
+        
+    
+    af.print_space("-")
+    
+    imprimir_texto_ensanguchado(TITULO_PANTALLA_SECUNDARIA, "c", "-")
+ 
+    opciones = {
+        "Recomendar Otra Serie Relacionada": recomendar_relacionado,
+        "Explorar nueva recomendación": lambda: recomendar_bfs(vecinos),
+        "Volver Al Menu Principal": mostrar_menu_principal,
+        "Salir": salir,
+    }           
+    
+    imprimir_pantalla_ensanguchada(list(opciones.keys()))
+    user = input(MENSAJE_AL_USUARIO_1 + f"({1}-{len(opciones)}): ")
+    
+    while seleccionar_opcion(user, list(opciones.values())) != True:
+        imprimir_pantalla_ensanguchada(list(opciones.keys()))
+        user = input(MENSAJE_AL_USUARIO_1 + f"({1}-{len(opciones)}): ")
+
+
 
 
 
@@ -410,27 +468,6 @@ def filtrar_por_genero():
 
 
 
-
-def filtrar_por_temporadas():
-    """ Imprime las series que tienen menos o igual cantidad de temporadas
-        que la ingresada por el usuario
-    """
-    print("NO IMPLEMENTADO AUN :(")
-    salir()
-    
-    
-
-
-def filtrar_por_duracion_episodio():
-    """ Imprime las series con menos duracion promedio de episodio
-        el usuario debe ingresar la duracion promedio de una lista en pantalla
-    """
-    print("NO IMPLEMENTADO AUN :(")
-    salir()
-
-
-
-
 def filtrar_por_edad():
     """ Imprime las peliculas que son aptas para cierto publico
         el usuario ingresa la opcion de edad de una lista en pantalla
@@ -438,7 +475,7 @@ def filtrar_por_edad():
     categoria_etaria = {
         "TV-G":  " Apto Para Todo Público",
         "TV-Y7": "7+",
-        "TV-PG": "(8-12+)", # Parent Guidance Suggested
+        "TV-PG": "(8-12)+", # Parent Guidance Suggested
         "TV-14": "14+",
         "TV-MA": "17+",
     }
@@ -494,8 +531,8 @@ def filtrar_por_edad():
 TITULO_PANTALLA_PRINCIPAL = "🎞 SERIESPLAY+ 🎞"
 TITULO_PANTALLA_SECUNDARIA = " MENU DE OPCIONES "
 
-MENSAJE_AL_USUARIO_1 = "SELECCIONE UNA OPCIÓN DEL MENU" # mensaje al usuario #1
-MENSAJE_AL_USUARIO_2 = ">>> ESA NO ES UNA OPCION DE LA LISTA!"
+MENSAJE_AL_USUARIO_1 = ">>>SELECCIONE UNA OPCIÓN DEL MENU" # mensaje al usuario #1
+MENSAJE_AL_USUARIO_2 = ">>>ESA NO ES UNA OPCION DEL MENU!"
 
 OPCIONES_PANTALLA_PRINCIPAL = {"Buscar Serie": buscar_series, # BST/AVL
                                "Ranking de Series Cortas Y Populares": recomendar_por_tiempo_disponible, # HEAP

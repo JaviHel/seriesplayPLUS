@@ -11,8 +11,6 @@ class Recorridos:
             orden.append(u)
             for v in grafo.vecinos(u):
                 if v not in visitados:
-                    # hay que agregar la condicion del tiempo
-                    # la misma de cuando se construye el grafo
                     visitados.add(v)
                     cola.append(v)
         return orden

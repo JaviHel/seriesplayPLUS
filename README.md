@@ -9,13 +9,12 @@ El sistema resuelve la fricción y parálisis por elección del usuario adaptand
 ## 🛠️ Estructuras de Datos Utilizadas
 
 * **Árbol AVL & BST:** Búsqueda eficiente y balanceada de series por título (O(log N)).
-* **Árbol General:** Organización jerárquica del catálogo por categorías (géneros y público objetivo) (O(log N)).
+* **Árbol General:** Organización jerárquica del catálogo por categorías (géneros y categorías de edad) (O(log N)).
 * **Max-Heap (Cola de Prioridad):** Selección eficiente de los tops y rankings según la duración de sesión o tiempo disponible del usuario (O(1) para la raíz y O(log N) en reordenamiento).
-* **Grafos:** Se usó un grafo no dirigido y no ponderado, representado con listas de adyacencia (GrafoLista), para la opción "Recomendar Serie Relacionada".
-* **BFS:** Se utilizó el algoritmo BFS para expandir la recomendacion de series relacionadas, para la opción "Recomendar Serie Relacionada".
+* **Grafos:** Se usó un grafo no dirigido y no ponderado, representado con listas de adyacencia (GrafoLista), para la opción "Recomendar Series Relacionadas a".
+* **BFS:** Se utilizó el algoritmo BFS para expandir la recomendacion de series relacionadas, para la opción "Explorar nueva recomendación" en la opción "Recomendar Series Relacionadas a".
 
 ---
-
 ## 🚀 Instrucciones de ejecución
 
 1. Abrir la terminal en la carpeta raíz del proyecto.
@@ -27,4 +26,6 @@ python main.py
 ---
 ## integrantes
 * *Javier Helguera*
+
+
 

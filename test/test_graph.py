@@ -1,5 +1,7 @@
+import sys
 from estructuras.grafos import GrafoMatriz, GrafoLista
 from algoritmos.recorridos import Recorridos
+from algoritmos.caminos_minimos import dijkstra_matriz
 from ui.carga_de_datos import cargar_json
 
 
@@ -38,8 +40,8 @@ def get_serie_index(serie_title:str, series:list) -> int:
             return series.index(serie)
     return None
 
-
-def cargar_grafo(grafo:GrafoLista, series:list): # O(n**2)
+# cargar grafo lista
+def cargar_grafo(grafo, series:list): # O(n**2)
     episode_duration_range = 10
     seasons_range = 2
     popularity_range = 10
@@ -92,8 +94,8 @@ def mostrar_relacionado_a():
 cargar_grafo(gl, series)
 
 
-my_serie = "the good doctor"
-my_serie_index = get_serie_index(my_serie, series)
+#my_serie = "the good doctor"
+#my_serie_index = get_serie_index(my_serie, series)
 
 #vecinos_gm = (gm.vecinos(my_serie_index))
 #mostrar_relacionado_a(my_serie, vecinos_gm)
@@ -102,20 +104,64 @@ my_serie_index = get_serie_index(my_serie, series)
 #mostrar_relacionado_a(my_serie, vecinos_gl)
 
 
-vecinos = mostrar_relacionado_a()
+#vecinos = mostrar_relacionado_a()
 
 
 #gm.mostrar()
 #gl.mostrar()
 
 
-print(vecinos)
-print(series[vecinos[1]]["title"])
+#print(vecinos)
+#print(series[vecinos[1]]["title"])
 
-# necesita la condicion de orden por tiempo y genero
-nuevos_vecinos = Recorridos.bfs(vecinos[1], gl)
-print(nuevos_vecinos) 
+#nuevos_vecinos = Recorridos.bfs(vecinos[1], gl)
+#print(nuevos_vecinos) 
 
+
+
+
+
+
+
+
+# cargar grafo matriz
+
+
+def cargar_grafo_matriz(grafo, series):
+    episode_duration_range = 2
+   
+    for i, serie_a in enumerate(series):
+        for j, serie_b in enumerate(series):
+            if (i != j
+            and series[i]["genre"] == series[j]["genre"]
+            and abs(series[i]["episode_duration_average"] - series[j]["episode_duration_average"]) <= episode_duration_range):
+                peso = abs(series[i]["episode_duration_average"] - series[j]["episode_duration_average"])
+                grafo.agregar_arista(i, j, peso)
+
+
+
+cargar_grafo_matriz(gm, series)
+
+# Buscar el camino minimo entre series del mismo genero y el peso es la menor duracion 
+
+s1 = "house"
+s2 = "breaking bad"
+
+index_s1 =  get_serie_index(s1, series)
+index_s2 =  get_serie_index(s2, series)
+
+
+# Retorna una lista con el camino minimo de la serie
+lst = dijkstra_matriz(gm.matriz, index_s1)
+
+lst_series = set() # Uso un set porque repite series
+
+for i in lst:
+    if 0 < i < len(lst):
+        lst_series.add(f"{series[i]["title"]}, {series[i]["episode_duration_average"]}")
+
+
+print(lst_series)
 
 
 

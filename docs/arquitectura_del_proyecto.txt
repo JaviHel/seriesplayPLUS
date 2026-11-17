@@ -1,0 +1,35 @@
+seriesplayplus/
+│
+├── algoritmos/
+│   ├── caminos_minimos.py
+│   └── recorridos.py
+│
+├── datos/
+│   ├── dataset_10.json
+│   ├── dataset_100.json
+│   ├── dataset_1000.json
+│   └── dataset_100000.json
+│
+├── docs/
+│   └── Reportes
+│
+├── estructuras/
+│   ├── arbol_binario.py
+│   ├── arbol_general.py
+│   ├── avl.py
+│   ├── grafos.py
+│   └── heap.py
+│
+├── test/
+│   ├── test_arbol_general.py 
+│   ├── test_avl_bst_complexity.py
+│   ├── test_graph.py
+│   ├── test_heap.py
+│   └── README.md
+│
+├── ui/
+│   ├── ascii_frame.py
+│   └── carga_de_datos.py
+│
+├── main.py
+└── README.md

@@ -134,13 +134,6 @@ def obtener_opcion_aleatoria(option="title"):
         "title" por default
     """
     return random.choice(SERIES)[option]
-    
-    
-def salir():
-    """ Rompe el while loop para cerrar el programa """
-    global LOOP
-    LOOP = False
-
 
 def seleccionar_opcion(user_input:str, method_call_lst:list):
     """ Dependiendo de lo que el usuario ingrese va a llamar a la opcion correcta 
@@ -172,7 +165,7 @@ def get_serie_index(serie_title:str, series:list):
 
 
 ##############################################################################################################
-# IMPRIMIR FUNCIONALIDAD DE LAS OPCIONES EN LA PANTALLA PRINCIPAL
+# FUNCIONALIDADES PRINCIPALES
 ##############################################################################################################
 
 def buscar_series():
@@ -518,11 +511,18 @@ def filtrar_por_edad():
     while seleccionar_opcion(user, list(opciones.values())) != True:
         imprimir_pantalla_ensanguchada(list(opciones.keys()))
         user = input(MENSAJE_AL_USUARIO_1 + f"({1}-{len(opciones)}): ")
+
+
+
         
 
 
-
-
+def salir():
+    """ Rompe el while loop para cerrar el programa """
+    global LOOP
+    LOOP = False
+    
+    
 
 ##############################################################################################################
 # MENUS Y OPCIONES
@@ -536,8 +536,8 @@ MENSAJE_AL_USUARIO_2 = ">>>ESA NO ES UNA OPCION DEL MENU!"
 
 OPCIONES_PANTALLA_PRINCIPAL = {"Buscar Serie": buscar_series, # BST/AVL
                                "Ranking de Series Cortas Y Populares": recomendar_por_tiempo_disponible, # HEAP
-                               "Recomendar Series Relacionadas a...": recomendar_relacionado, # BFS/DFS
-                               "Recomendar Serie Aleatoria": recomendar_aleatorio, # GRAFO
+                               "Recomendar Series Relacionadas a...": recomendar_relacionado, # GRAFO LISTA, BFS
+                               "Recomendar Serie Aleatoria": recomendar_aleatorio, 
                                "Filtrar Por Genero": filtrar_por_genero, # Arbol General
                                "Filtrar Por Categoría De Edad": filtrar_por_edad, # Arbol General
 #                               "Filtrar Por Cantidad De Temporadas": filtrar_por_temporadas,
@@ -563,7 +563,6 @@ def mostrar_menu_principal():
 def main():    
     mostrar_menu_principal()
     while LOOP:
-        # Los mensajes deberian ser dinamicos tambien
         user = input(MENSAJE_AL_USUARIO_1 + f"({1}-{len(OPCIONES_PANTALLA_PRINCIPAL)}): ")
         #Necesita el user_input y los valores de un diccionario con funciones
         seleccionar_opcion(user, list(OPCIONES_PANTALLA_PRINCIPAL.values()))
